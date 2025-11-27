@@ -1,10 +1,20 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import fachadaImg from './assets/fachada.jpg'
+import simpleImg from './assets/simple.jpg'
+import dobleImg from './assets/doble.jpg'
+import familiarImg from './assets/familiar.jpg'
 
 const ROOM_PRICES = {
   'Simple': 100,
   'Doble': 120,
   'Familiar': 180
+}
+
+const ROOM_IMAGES = {
+  'Simple': simpleImg,
+  'Doble': dobleImg,
+  'Familiar': familiarImg
 }
 
 function App() {
@@ -19,6 +29,9 @@ function App() {
   const [guestDni, setGuestDni] = useState('')
   const [selectedRoom, setSelectedRoom] = useState('')
   const [stayDuration, setStayDuration] = useState('')
+
+  // Modal State
+  const [modalImage, setModalImage] = useState(null)
 
   const [rooms, setRooms] = useState(() => {
     const savedRooms = localStorage.getItem('hotel-wari-rooms')
@@ -99,9 +112,12 @@ function App() {
     if (window.confirm('¿Confirmar salida?')) {
       const updatedRooms = rooms.map(room => {
         if (room.number === roomNumber) {
-          // Create a new object without guest properties
-          const { guestName, entryTime, stayDuration, totalCost, ...rest } = room
-          return { ...rest, status: 'libre' }
+          return {
+            number: room.number,
+            type: room.type,
+            floor: room.floor,
+            status: 'libre'
+          }
         }
         return room
       })
@@ -120,8 +136,13 @@ function App() {
             <div className="rooms-grid">
               {rooms.filter(r => r.floor === 2).map(room => (
                 <div key={room.number} className={`room-card status-${room.status}`}>
-                  <span className="room-number">{room.number}</span>
-                  <span className="room-type">{room.type}</span>
+                  <div className="room-header">
+                    <div className="room-info">
+                      <span className="room-number">{room.number}</span>
+                      <span className="room-type">{room.type}</span>
+                    </div>
+                    <img src={ROOM_IMAGES[room.type]} alt={room.type} className="room-thumbnail" />
+                  </div>
                   {room.status === 'ocupado' && room.guestName && (
                     <div className="guest-details">
                       <p><strong>Huésped:</strong> {room.guestName}</p>
@@ -141,8 +162,13 @@ function App() {
             <div className="rooms-grid">
               {rooms.filter(r => r.floor === 3).map(room => (
                 <div key={room.number} className={`room-card status-${room.status}`}>
-                  <span className="room-number">{room.number}</span>
-                  <span className="room-type">{room.type}</span>
+                  <div className="room-header">
+                    <div className="room-info">
+                      <span className="room-number">{room.number}</span>
+                      <span className="room-type">{room.type}</span>
+                    </div>
+                    <img src={ROOM_IMAGES[room.type]} alt={room.type} className="room-thumbnail" />
+                  </div>
                   {room.status === 'ocupado' && room.guestName && (
                     <div className="guest-details">
                       <p><strong>Huésped:</strong> {room.guestName}</p>
@@ -224,7 +250,10 @@ function App() {
 
     return (
       <div className="dashboard-container">
-        <h1 className="dashboard-title">Panel de Control</h1>
+        <div className="dashboard-header">
+          <img src={fachadaImg} alt="Hotel Wari Fachada" className="hotel-facade" />
+          <h1 className="dashboard-title">Panel de Control</h1>
+        </div>
         <div className="dashboard-grid">
           <div className="dashboard-card" onClick={() => setCurrentView('rooms')}>
             <h3>Ver Habitaciones</h3>
