@@ -732,6 +732,39 @@
   font-size: 0.95rem;
 }
 
+/* Estilos para selector de método de pago en modal */
+.grupo-metodo-pago {
+  margin: 1.5rem 0 1rem 0;
+  text-align: left;
+}
+
+.grupo-metodo-pago label {
+  display: block;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.selector-metodo-pago {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid white;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  color: #FFA500;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.selector-metodo-pago:focus {
+  outline: none;
+  border-color: #2ecc71;
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+}
+
 /* Estilos para formulario de registro horizontal */
 .grupo-formulario-horizontal {
   display: flex;
@@ -903,6 +936,17 @@
 .celda-total {
   color: #27ae60;
   font-size: 1.05rem;
+}
+
+.metodo-pago-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background-color: #8b5cf6;
+  color: white;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 /* Responsive para tabla de facturación */
@@ -1240,4 +1284,19 @@
   .boton-cerrar-sesion svg {
     font-size: 1.5rem;
   }
+}
+/* Estilos para mensaje de pago ya realizado */
+.mensaje-pago-realizado {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: rgba(46, 204, 113, 0.2);
+  border: 2px solid #2ecc71;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.mensaje-pago-realizado p {
+  color: white;
+  font-size: 1.1rem;
+  margin: 0;
 }

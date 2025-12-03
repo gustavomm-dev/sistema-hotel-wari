@@ -50,10 +50,12 @@ function App() {
   const [dniHuesped, setDniHuesped] = useState('')
   const [habitacionSeleccionada, setHabitacionSeleccionada] = useState('')
   const [duracionEstadia, setDuracionEstadia] = useState('')
+  const [metodoPagoRegistro, setMetodoPagoRegistro] = useState('Paga al finalizar estadía')
 
   // Estado del Modal de Confirmación de Salida
   const [mostrarModalSalida, setMostrarModalSalida] = useState(false)
   const [habitacionParaSalida, setHabitacionParaSalida] = useState(null)
+  const [metodoPagoSeleccionado, setMetodoPagoSeleccionado] = useState('Paga al finalizar estadía')
 
   // Estado del Modal de Imagen (Zoom)
   const [imagenAmpliada, setImagenAmpliada] = useState(null)
@@ -231,7 +233,8 @@ function App() {
           dniHuesped: dniHuesped,
           horaEntrada: cadenaHora,
           duracionEstadia: `${duracionEstadia} noches`,
-          costoTotal: costoCalculado
+          costoTotal: costoCalculado,
+          metodoPago: metodoPagoRegistro
         }
       }
       return habitacion
@@ -243,10 +246,17 @@ function App() {
     setDniHuesped('')
     setHabitacionSeleccionada('')
     setDuracionEstadia('')
+    setMetodoPagoRegistro('Paga al finalizar estadía')
     setVistaActual('habitaciones')
   }
 
   const solicitarSalida = (numeroHabitacion) => {
+    const habitacion = habitaciones.find(h => h.numero === numeroHabitacion)
+    if (habitacion && habitacion.metodoPago) {
+      setMetodoPagoSeleccionado(habitacion.metodoPago)
+    } else {
+      setMetodoPagoSeleccionado('Paga al finalizar estadía')
+    }
     setHabitacionParaSalida(numeroHabitacion)
     setMostrarModalSalida(true)
   }
@@ -300,11 +310,13 @@ function App() {
     // Cerrar modal y limpiar estado
     setMostrarModalSalida(false)
     setHabitacionParaSalida(null)
+    setMetodoPagoSeleccionado('Paga al finalizar estadía')
   }
 
   const cancelarSalida = () => {
     setMostrarModalSalida(false)
     setHabitacionParaSalida(null)
+    setMetodoPagoSeleccionado('Paga al finalizar estadía')
   }
 
   const terminarLimpieza = (numeroHabitacion) => {
@@ -481,6 +493,7 @@ function App() {
                         <p><strong>Ingreso:</strong> {habitacion.horaEntrada}</p>
                         <p><strong>Estadía:</strong> {habitacion.duracionEstadia}</p>
                         {habitacion.costoTotal && <p><strong>Total:</strong> S/ {habitacion.costoTotal}</p>}
+                        {habitacion.metodoPago && <p><strong>Pago:</strong> {habitacion.metodoPago}</p>}
                         {usuarioActual?.rol === 'recepcionista' && (
                           <button className="boton-salida" onClick={() => solicitarSalida(habitacion.numero)}>Finalizar Estadía</button>
                         )}
@@ -536,6 +549,7 @@ function App() {
                         <p><strong>Ingreso:</strong> {habitacion.horaEntrada}</p>
                         <p><strong>Estadía:</strong> {habitacion.duracionEstadia}</p>
                         {habitacion.costoTotal && <p><strong>Total:</strong> S/ {habitacion.costoTotal}</p>}
+                        {habitacion.metodoPago && <p><strong>Pago:</strong> {habitacion.metodoPago}</p>}
                         {usuarioActual?.rol === 'recepcionista' && (
                           <button className="boton-salida" onClick={() => solicitarSalida(habitacion.numero)}>Finalizar Estadía</button>
                         )}
@@ -568,6 +582,36 @@ function App() {
                   <br />
                   <span className="mensaje-despedida">¡Esperamos verles pronto de nuevo!</span>
                 </p>
+                {(() => {
+                  const habitacion = habitaciones.find(h => h.numero === habitacionParaSalida)
+                  const yaPago = habitacion && habitacion.metodoPago && (habitacion.metodoPago === 'Tarjeta' || habitacion.metodoPago === 'Yape/Plin' || habitacion.metodoPago === 'Transferencia')
+                  
+                  if (yaPago) {
+                    return (
+                      <div className="mensaje-pago-realizado">
+                        <p> Pago ya realizado: <strong>{habitacion.metodoPago}</strong></p>
+                      </div>
+                    )
+                  } else {
+                    return (
+                      <div className="grupo-metodo-pago">
+                        <label htmlFor="metodo-pago">M�todo de Pago:</label>
+                        <select 
+                          id="metodo-pago"
+                          className="selector-metodo-pago" 
+                          value={metodoPagoSeleccionado}
+                          onChange={(e) => setMetodoPagoSeleccionado(e.target.value)}
+                        >
+                          <option value="Paga al finalizar estad�a">Paga al finalizar estad�a</option>
+                          <option value="Efectivo">Efectivo</option>
+                          <option value="Tarjeta">Tarjeta</option>
+                          <option value="Yape/Plin">Yape/Plin</option>
+                          <option value="Transferencia">Transferencia</option>
+                        </select>
+                      </div>
+                    )
+                  }
+                })()}
                 <div className="acciones-modal">
                   <button className="boton-cancelar-modal" onClick={cancelarSalida}>Cancelar</button>
                   <button className="boton-confirmar-modal" onClick={confirmarSalida}>Confirmar</button>
@@ -622,6 +666,19 @@ function App() {
               <label>Estadía (noches)</label>
               <input type="number" value={duracionEstadia} onChange={(e) => setDuracionEstadia(e.target.value)} placeholder="Ej: 2" min="1" />
             </div>
+            <div className="grupo-formulario-horizontal">
+              <label>M�todo de Pago</label>
+              <select 
+                value={metodoPagoRegistro}
+                onChange={(e) => setMetodoPagoRegistro(e.target.value)}
+              >
+                <option value="Paga al finalizar estad�a">Paga al finalizar estad�a</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Tarjeta">Tarjeta</option>
+                <option value="Yape/Plin">Yape/Plin</option>
+                <option value="Transferencia">Transferencia</option>
+              </select>
+            </div>
 
             {/* Previsualización del Costo */}
             {habitacionSeleccionada && duracionEstadia && (
@@ -671,6 +728,7 @@ function App() {
                       <th>Huésped</th>
                       <th>DNI</th>
                       <th>Estadía</th>
+                      <th>M�todo de Pago</th>
                       <th>Total (S/)</th>
                     </tr>
                   </thead>
@@ -683,6 +741,7 @@ function App() {
                         <td>{venta.tipoHabitacion}</td>
                         <td>{venta.nombreHuesped}</td>
                         <td>{venta.dniHuesped}</td>
+                        <td><span className="metodo-pago-badge">{venta.metodoPago || 'N/A'}</span></td>
                         <td>{venta.duracionEstadia}</td>
                         <td className="celda-total"><strong>S/ {venta.costoTotal}</strong></td>
                       </tr>
@@ -855,3 +914,4 @@ function App() {
   )
 }
 export default App
+
