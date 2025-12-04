@@ -5,7 +5,7 @@ import simpleImg from './assets/simple.jpg'
 import dobleImg from './assets/doble.jpg'
 import familiarImg from './assets/familiar.jpg'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBed, faUserPlus, faReceipt, faBoxes, faHome, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import { faBed, faUserPlus, faReceipt, faBoxes, faHome, faSignOutAlt, faComments, faTrash, faCoffee } from '@fortawesome/free-solid-svg-icons'
 import {
   BarChart,
   Bar,
@@ -144,6 +144,22 @@ function App() {
   useEffect(() => {
     localStorage.setItem('hotel-wari-clientes', JSON.stringify(clientes))
   }, [clientes])
+
+  // Estado de Mensajería
+  const [mensajes, setMensajes] = useState(() => {
+    const mensajesGuardados = localStorage.getItem('hotel-wari-mensajes')
+    if (mensajesGuardados) {
+      return JSON.parse(mensajesGuardados)
+    }
+    return []
+  })
+
+  const [nuevoMensaje, setNuevoMensaje] = useState('')
+
+  useEffect(() => {
+    localStorage.setItem('hotel-wari-mensajes', JSON.stringify(mensajes))
+  }, [mensajes])
+
 
   // Funciones de Lógica
   const manejarLogin = () => {
@@ -370,7 +386,133 @@ function App() {
       })
   }
 
-  // Función de Cierre de Sesión
+  // Funciones de Mensajería
+  const enviarMensaje = () => {
+    if (!nuevoMensaje.trim()) {
+      alert('Por favor escribe un mensaje')
+      return
+    }
+
+    const mensaje = {
+      id: Date.now(),
+      remitente: usuarioActual.usuario,
+      rolRemitente: usuarioActual.rol,
+      contenido: nuevoMensaje,
+      fecha: new Date().toLocaleDateString('es-PE'),
+      hora: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
+      leido: false
+    }
+
+    setMensajes(prevMensajes => [mensaje, ...prevMensajes])
+    setNuevoMensaje('')
+  }
+
+  const eliminarMensaje = (id) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este mensaje?')) {
+      setMensajes(prevMensajes => prevMensajes.filter(m => m.id !== id))
+    }
+  }
+
+  const marcarMensajesComoLeidos = () => {
+    setMensajes(prevMensajes =>
+      prevMensajes.map(mensaje => {
+        // Solo marcar como leídos los mensajes que NO fueron enviados por el usuario actual
+        if (mensaje.remitente !== usuarioActual.usuario) {
+          return { ...mensaje, leido: true }
+        }
+        return mensaje
+      })
+    )
+  }
+
+  const contarMensajesNoLeidos = () => {
+    return mensajes.filter(mensaje =>
+      !mensaje.leido && mensaje.remitente !== usuarioActual?.usuario
+    ).length
+  }
+
+  // Funciones de Desayuno
+  const toggleDesayuno = (numeroHabitacion) => {
+    const habitacionesActualizadas = habitaciones.map(habitacion => {
+      if (habitacion.numero === numeroHabitacion) {
+        const nuevoEstadoDesayuno = !habitacion.desayuno
+        const cantidad = habitacion.cantidadDesayunos || 1
+
+        // Recalcular costo
+        const costoBase = PRECIOS_HABITACION[habitacion.tipo] * parseInt(habitacion.duracionEstadia.split(' ')[0])
+        const costoDesayuno = nuevoEstadoDesayuno ? (cantidad * 20) : 0
+
+        return {
+          ...habitacion,
+          desayuno: nuevoEstadoDesayuno,
+          cantidadDesayunos: cantidad,
+          estadoDesayuno: nuevoEstadoDesayuno ? 'pendiente' : null,
+          costoTotal: costoBase + costoDesayuno
+        }
+      }
+      return habitacion
+    })
+
+    setHabitaciones(habitacionesActualizadas)
+    localStorage.setItem('hotel-wari-habitaciones', JSON.stringify(habitacionesActualizadas))
+  }
+
+  const cambiarCantidadDesayuno = (numeroHabitacion, cambio) => {
+    const habitacionesActualizadas = habitaciones.map(habitacion => {
+      if (habitacion.numero === numeroHabitacion) {
+        // Solo permitir cambios si está pendiente
+        if (habitacion.estadoDesayuno !== 'pendiente') return habitacion
+
+        const nuevaCantidad = Math.max(1, (habitacion.cantidadDesayunos || 1) + cambio)
+
+        // Recalcular costo
+        const costoBase = PRECIOS_HABITACION[habitacion.tipo] * parseInt(habitacion.duracionEstadia.split(' ')[0])
+        const costoDesayuno = habitacion.desayuno ? (nuevaCantidad * 20) : 0
+
+        return {
+          ...habitacion,
+          cantidadDesayunos: nuevaCantidad,
+          costoTotal: costoBase + costoDesayuno
+        }
+      }
+      return habitacion
+    })
+
+    setHabitaciones(habitacionesActualizadas)
+    localStorage.setItem('hotel-wari-habitaciones', JSON.stringify(habitacionesActualizadas))
+  }
+
+  const confirmarPedido = (numeroHabitacion) => {
+    const habitacionesActualizadas = habitaciones.map(habitacion => {
+      if (habitacion.numero === numeroHabitacion) {
+        return { ...habitacion, estadoDesayuno: 'confirmado' }
+      }
+      return habitacion
+    })
+    setHabitaciones(habitacionesActualizadas)
+    localStorage.setItem('hotel-wari-habitaciones', JSON.stringify(habitacionesActualizadas))
+  }
+
+  const gestionarPedidoAdmin = (numeroHabitacion, nuevoEstado) => {
+    const habitacionesActualizadas = habitaciones.map(habitacion => {
+      if (habitacion.numero === numeroHabitacion) {
+        if (nuevoEstado === 'cancelado') {
+          // Si se cancela, quitamos el desayuno y recalculamos costo
+          const costoBase = PRECIOS_HABITACION[habitacion.tipo] * parseInt(habitacion.duracionEstadia.split(' ')[0])
+          return {
+            ...habitacion,
+            desayuno: false,
+            estadoDesayuno: null,
+            costoTotal: costoBase
+          }
+        }
+        return { ...habitacion, estadoDesayuno: nuevoEstado }
+      }
+      return habitacion
+    })
+    setHabitaciones(habitacionesActualizadas)
+    localStorage.setItem('hotel-wari-habitaciones', JSON.stringify(habitacionesActualizadas))
+  }
   const cerrarSesion = () => {
     setEstaAutenticado(false)
     setUsuarioActual(null)
@@ -399,22 +541,40 @@ function App() {
             <span>Habitaciones</span>
           </button>
           {usuarioActual?.rol === 'recepcionista' && (
-            <button
-              className={`navbar-enlace ${vistaActual === 'registro' ? 'activo' : ''}`}
-              onClick={() => setVistaActual('registro')}
-            >
-              <FontAwesomeIcon icon={faUserPlus} />
-              <span>Registro</span>
-            </button>
+            <>
+              <button
+                className={`navbar-enlace ${vistaActual === 'registro' ? 'activo' : ''}`}
+                onClick={() => setVistaActual('registro')}
+              >
+                <FontAwesomeIcon icon={faUserPlus} />
+                <span>Registro</span>
+              </button>
+              <button
+                className={`navbar-enlace ${vistaActual === 'desayunos' ? 'activo' : ''}`}
+                onClick={() => setVistaActual('desayunos')}
+              >
+                <FontAwesomeIcon icon={faCoffee} />
+                <span>Desayunos</span>
+              </button>
+            </>
           )}
           {usuarioActual?.rol === 'administrador' && (
-            <button
-              className={`navbar-enlace ${vistaActual === 'facturacion' ? 'activo' : ''}`}
-              onClick={() => setVistaActual('facturacion')}
-            >
-              <FontAwesomeIcon icon={faReceipt} />
-              <span>Facturación</span>
-            </button>
+            <>
+              <button
+                className={`navbar-enlace ${vistaActual === 'facturacion' ? 'activo' : ''}`}
+                onClick={() => setVistaActual('facturacion')}
+              >
+                <FontAwesomeIcon icon={faReceipt} />
+                <span>Facturación</span>
+              </button>
+              <button
+                className={`navbar-enlace ${vistaActual === 'desayunos' ? 'activo' : ''}`}
+                onClick={() => setVistaActual('desayunos')}
+              >
+                <FontAwesomeIcon icon={faCoffee} />
+                <span>Desayunos</span>
+              </button>
+            </>
           )}
           <button
             className={`navbar-enlace ${vistaActual === 'inventario' ? 'activo' : ''}`}
@@ -422,6 +582,19 @@ function App() {
           >
             <FontAwesomeIcon icon={faBoxes} />
             <span>Inventario</span>
+          </button>
+          <button
+            className={`navbar-enlace ${vistaActual === 'mensajes' ? 'activo' : ''}`}
+            onClick={() => {
+              setVistaActual('mensajes')
+              marcarMensajesComoLeidos()
+            }}
+          >
+            <FontAwesomeIcon icon={faComments} />
+            <span>Mensajes</span>
+            {contarMensajesNoLeidos() > 0 && (
+              <span className="badge-mensajes">{contarMensajesNoLeidos()}</span>
+            )}
           </button>
         </div>
         <button className="boton-cerrar-sesion" onClick={cerrarSesion}>
@@ -585,7 +758,7 @@ function App() {
                 {(() => {
                   const habitacion = habitaciones.find(h => h.numero === habitacionParaSalida)
                   const yaPago = habitacion && habitacion.metodoPago && (habitacion.metodoPago === 'Tarjeta' || habitacion.metodoPago === 'Yape/Plin' || habitacion.metodoPago === 'Transferencia')
-                  
+
                   if (yaPago) {
                     return (
                       <div className="mensaje-pago-realizado">
@@ -595,14 +768,14 @@ function App() {
                   } else {
                     return (
                       <div className="grupo-metodo-pago">
-                        <label htmlFor="metodo-pago">M�todo de Pago:</label>
-                        <select 
+                        <label htmlFor="metodo-pago">M�todo de Pago:</label>
+                        <select
                           id="metodo-pago"
-                          className="selector-metodo-pago" 
+                          className="selector-metodo-pago"
                           value={metodoPagoSeleccionado}
                           onChange={(e) => setMetodoPagoSeleccionado(e.target.value)}
                         >
-                          <option value="Paga al finalizar estad�a">Paga al finalizar estad�a</option>
+                          <option value="Paga al finalizar estad�a">Paga al finalizar estad�a</option>
                           <option value="Efectivo">Efectivo</option>
                           <option value="Tarjeta">Tarjeta</option>
                           <option value="Yape/Plin">Yape/Plin</option>
@@ -667,12 +840,12 @@ function App() {
               <input type="number" value={duracionEstadia} onChange={(e) => setDuracionEstadia(e.target.value)} placeholder="Ej: 2" min="1" />
             </div>
             <div className="grupo-formulario-horizontal">
-              <label>M�todo de Pago</label>
-              <select 
+              <label>M�todo de Pago</label>
+              <select
                 value={metodoPagoRegistro}
                 onChange={(e) => setMetodoPagoRegistro(e.target.value)}
               >
-                <option value="Paga al finalizar estad�a">Paga al finalizar estad�a</option>
+                <option value="Paga al finalizar estad�a">Paga al finalizar estad�a</option>
                 <option value="Efectivo">Efectivo</option>
                 <option value="Tarjeta">Tarjeta</option>
                 <option value="Yape/Plin">Yape/Plin</option>
@@ -728,7 +901,7 @@ function App() {
                       <th>Huésped</th>
                       <th>DNI</th>
                       <th>Estadía</th>
-                      <th>M�todo de Pago</th>
+                      <th>M�todo de Pago</th>
                       <th>Total (S/)</th>
                     </tr>
                   </thead>
@@ -818,6 +991,222 @@ function App() {
       )
     }
 
+    // Vista de Desayunos
+    else if (vistaActual === 'desayunos') {
+      const habitacionesOcupadas = habitaciones.filter(h => h.estado === 'ocupado')
+
+      // Filtrar para admin: solo mostrar si tienen desayuno solicitado (o todos si se prefiere)
+      const habitacionesAmostrar = usuarioActual.rol === 'administrador'
+        ? habitacionesOcupadas.filter(h => h.desayuno)
+        : habitacionesOcupadas
+
+      contenidoVista = (
+        <div className="contenedor-desayunos">
+          <h1 className="titulo-desayunos">Servicio de Desayuno</h1>
+          <p className="subtitulo-desayunos">
+            {usuarioActual.rol === 'administrador'
+              ? 'Gestión de pedidos de desayuno'
+              : 'Solicitud de desayunos para huéspedes'}
+          </p>
+
+          <div className="cuadricula-desayunos">
+            {habitacionesAmostrar.length === 0 ? (
+              <div className="mensaje-vacio">
+                <p>No hay solicitudes pendientes.</p>
+              </div>
+            ) : (
+              habitacionesAmostrar.map(habitacion => (
+                <div key={habitacion.numero} className={`tarjeta-desayuno ${habitacion.desayuno ? 'con-desayuno' : ''}`}>
+                  <div className="encabezado-desayuno">
+                    <span className="numero-hab">Habitación {habitacion.numero}</span>
+                    <span className={`estado-servicio ${habitacion.estadoDesayuno ? `badge-estado-${habitacion.estadoDesayuno}` : ''}`}>
+                      {habitacion.desayuno
+                        ? (habitacion.estadoDesayuno === 'pendiente' ? 'Pendiente de Confirmar'
+                          : habitacion.estadoDesayuno === 'confirmado' ? 'Confirmado'
+                            : 'En Preparación')
+                        : 'Sin Servicio'}
+                    </span>
+                  </div>
+
+                  <div className="info-huesped-desayuno">
+                    <p><strong>Huésped:</strong> {habitacion.nombreHuesped}</p>
+                    <p><strong>Personas:</strong> {habitacion.tipo === 'Simple' ? '1' : habitacion.tipo === 'Doble' ? '2' : '3-4'}</p>
+                  </div>
+
+                  <div className="controles-desayuno">
+                    {habitacion.desayuno ? (
+                      <div className="control-cantidad">
+                        <p>Cantidad de Desayunos:</p>
+
+                        {/* Controles de cantidad: Solo editables por recepcionista si está pendiente */}
+                        <div className="botones-cantidad">
+                          {usuarioActual.rol === 'recepcionista' && habitacion.estadoDesayuno === 'pendiente' && (
+                            <button
+                              onClick={() => cambiarCantidadDesayuno(habitacion.numero, -1)}
+                              disabled={habitacion.cantidadDesayunos <= 1}
+                            >
+                              -
+                            </button>
+                          )}
+
+                          <span>{habitacion.cantidadDesayunos || 1}</span>
+
+                          {usuarioActual.rol === 'recepcionista' && habitacion.estadoDesayuno === 'pendiente' && (
+                            <button onClick={() => cambiarCantidadDesayuno(habitacion.numero, 1)}>+</button>
+                          )}
+                        </div>
+
+                        <p className="costo-desayuno">
+                          Costo adicional: S/ {(habitacion.cantidadDesayunos || 1) * 20}
+                        </p>
+
+                        {/* Acciones para Recepcionista */}
+                        {usuarioActual.rol === 'recepcionista' && (
+                          <>
+                            {habitacion.estadoDesayuno === 'pendiente' ? (
+                              <div className="acciones-recepcion">
+                                <button
+                                  className="boton-confirmar-pedido"
+                                  onClick={() => confirmarPedido(habitacion.numero)}
+                                >
+                                  Confirmar Pedido
+                                </button>
+                                <button
+                                  className="boton-quitar-desayuno"
+                                  onClick={() => toggleDesayuno(habitacion.numero)}
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            ) : (
+                              <p className="mensaje-info">Pedido enviado a cocina</p>
+                            )}
+                          </>
+                        )}
+
+                        {/* Acciones para Administrador */}
+                        {usuarioActual.rol === 'administrador' && (
+                          <div className="acciones-admin">
+                            {habitacion.estadoDesayuno === 'confirmado' && (
+                              <button
+                                className="boton-aceptar-pedido"
+                                onClick={() => gestionarPedidoAdmin(habitacion.numero, 'preparando')}
+                              >
+                                Aceptar / Preparar
+                              </button>
+                            )}
+                            <button
+                              className="boton-cancelar-pedido-admin"
+                              onClick={() => {
+                                if (window.confirm('¿Cancelar este pedido de desayuno?')) {
+                                  gestionarPedidoAdmin(habitacion.numero, 'cancelado')
+                                }
+                              }}
+                            >
+                              Cancelar Pedido
+                            </button>
+                          </div>
+                        )}
+
+                      </div>
+                    ) : (
+                      /* Solo recepcionista puede iniciar pedidos */
+                      usuarioActual.rol === 'recepcionista' && (
+                        <button
+                          className="boton-agregar-desayuno"
+                          onClick={() => toggleDesayuno(habitacion.numero)}
+                        >
+                          <FontAwesomeIcon icon={faCoffee} /> Agregar Desayuno
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    // Vista de Mensajería
+    else if (vistaActual === 'mensajes') {
+      contenidoVista = (
+        <div className="contenedor-mensajeria">
+          <h1 className="titulo-mensajeria">Mensajería Interna</h1>
+          <p className="subtitulo-mensajeria">
+            Comunicación entre Recepción y Administración
+          </p>
+
+          <div className="contenedor-chat">
+            <div className="lista-mensajes">
+              {mensajes.length === 0 ? (
+                <div className="mensaje-vacio">
+                  <p>No hay mensajes aún.</p>
+                  <p>Envía el primer mensaje para comenzar la conversación.</p>
+                </div>
+              ) : (
+                mensajes.map(mensaje => {
+                  const esMensajePropio = mensaje.remitente === usuarioActual.usuario
+                  return (
+                    <div
+                      key={mensaje.id}
+                      className={`mensaje-item ${esMensajePropio ? 'mensaje-propio' : 'mensaje-ajeno'}`}
+                    >
+                      <div className="mensaje-encabezado">
+                        <span className="mensaje-remitente">
+                          {esMensajePropio ? 'Tú' : mensaje.remitente}
+                          {!esMensajePropio && (
+                            <span className="mensaje-rol">
+                              ({mensaje.rolRemitente === 'administrador' ? 'Administrador' : 'Recepcionista'})
+                            </span>
+                          )}
+                        </span>
+                        <span className="mensaje-fecha">
+                          {mensaje.fecha} - {mensaje.hora}
+                          {esMensajePropio && (
+                            <button
+                              className="boton-eliminar-mensaje"
+                              onClick={() => eliminarMensaje(mensaje.id)}
+                              title="Eliminar mensaje"
+                            >
+                              <FontAwesomeIcon icon={faTrash} />
+                            </button>
+                          )}
+                        </span>
+                      </div>
+                      <div className="mensaje-contenido">
+                        {mensaje.contenido}
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+
+            <div className="formulario-mensaje">
+              <textarea
+                className="input-mensaje"
+                placeholder="Escribe tu mensaje aquí..."
+                value={nuevoMensaje}
+                onChange={(e) => setNuevoMensaje(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    enviarMensaje()
+                  }
+                }}
+                rows="3"
+              />
+              <button className="boton-enviar-mensaje" onClick={enviarMensaje}>
+                Enviar Mensaje
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     // Vista del Tablero (Dashboard)
     else {
       const datosIngresos = procesarIngresosDiarios()
@@ -835,7 +1224,7 @@ function App() {
           </div>
 
           {/* Sección de Resumen de Ingresos */}
-          {datosIngresos.length > 0 && (
+          {usuarioActual?.rol === 'administrador' && datosIngresos.length > 0 && (
             <div className="seccion-resumen-ingresos">
               <h2>Resumen de Ingresos</h2>
               <ResponsiveContainer width="100%" height={300}>
