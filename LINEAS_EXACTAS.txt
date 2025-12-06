@@ -1,0 +1,76 @@
+========================================
+LÍNEAS EXACTAS PARA PEGAR LOS CÓDIGOS RESTANTES
+========================================
+
+✅ BLOQUE 1: YA PEGADO (Botón en el menú) ✅
+
+Faltan 2 bloques:
+
+========================================
+📍 BLOQUE 2: TARJETA EN EL DASHBOARD
+========================================
+
+UBICACIÓN: Busca en App.jsx donde dice:
+
+  if (vistaActual === 'tablero')
+
+Dentro de esa sección, busca donde están las tarjetas del dashboard.
+Verás algo como:
+
+  <div className="cuadricula-tablero">
+    <div className="tarjeta-menu" onClick={...}>
+      ...
+    </div>
+    <div className="tarjeta-menu" onClick={...}>
+      ...
+    </div>
+  </div>
+
+PEGA EL BLOQUE 2 JUSTO ANTES del </div> que cierra "cuadricula-tablero"
+
+El código del BLOQUE 2 es:
+
+            <div className="tarjeta-menu" onClick={() => setVistaActual('amenities')}>
+              <FontAwesomeIcon icon={faPumpSoap} className="icono-menu" />
+              <h3>Usos Diarios en el Hotel</h3>
+              <p>Entrega de productos</p>
+            </div>
+
+
+========================================
+📍 BLOQUE 3: VISTA COMPLETA DE AMENITIES
+========================================
+
+UBICACIÓN: Línea aproximada 1053
+
+Busca en App.jsx donde dice:
+
+  // Vista de Registro
+  else if (vistaActual === 'registro') {
+
+PEGA EL BLOQUE 3 JUSTO ANTES de esa línea.
+
+Es decir, el código quedará así:
+
+  }
+
+  [AQUÍ PEGAR TODO EL BLOQUE 3]
+
+  // Vista de Registro
+  else if (vistaActual === 'registro') {
+
+
+========================================
+RESUMEN:
+========================================
+
+1. ✅ BLOQUE 1: Ya pegado en el menú
+
+2. BLOQUE 2: Buscar "cuadricula-tablero" → Pegar antes del </div> de cierre
+
+3. BLOQUE 3: Buscar línea 1053 "Vista de Registro" → Pegar ANTES
+
+========================================
+
+Usa Ctrl+F para buscar el texto
+Usa Ctrl+G para ir a una línea específica
