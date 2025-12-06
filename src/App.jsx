@@ -240,6 +240,103 @@ function App() {
     localStorage.setItem('hotel-wari-historial-amenities', JSON.stringify(historialAmenities))
   }, [historialAmenities])
 
+  // --- Sincronización en Tiempo Real entre Pestañas/Sesiones ---
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      // Sincronizar habitaciones
+      if (e.key === 'hotel-wari-habitaciones' && e.newValue) {
+        try {
+          const nuevasHabitaciones = JSON.parse(e.newValue)
+          if (nuevasHabitaciones && Array.isArray(nuevasHabitaciones)) {
+            setHabitaciones(nuevasHabitaciones)
+          }
+        } catch (error) {
+          console.error("Error al sincronizar habitaciones:", error)
+        }
+      }
+
+      // Sincronizar inventario
+      if (e.key === 'hotel-wari-inventario' && e.newValue) {
+        try {
+          const nuevoInventario = JSON.parse(e.newValue)
+          if (nuevoInventario && Array.isArray(nuevoInventario)) {
+            setInventario(nuevoInventario)
+          }
+        } catch (error) {
+          console.error("Error al sincronizar inventario:", error)
+        }
+      }
+
+      // Sincronizar amenities
+      if (e.key === 'hotel-wari-amenities' && e.newValue) {
+        try {
+          const nuevosAmenities = JSON.parse(e.newValue)
+          if (nuevosAmenities && Array.isArray(nuevosAmenities)) {
+            setAmenities(nuevosAmenities)
+          }
+        } catch (error) {
+          console.error("Error al sincronizar amenities:", error)
+        }
+      }
+
+      // Sincronizar historial de amenities
+      if (e.key === 'hotel-wari-historial-amenities' && e.newValue) {
+        try {
+          const nuevoHistorial = JSON.parse(e.newValue)
+          if (nuevoHistorial && Array.isArray(nuevoHistorial)) {
+            setHistorialAmenities(nuevoHistorial)
+          }
+        } catch (error) {
+          console.error("Error al sincronizar historial amenities:", error)
+        }
+      }
+
+      // Sincronizar historial de ventas
+      if (e.key === 'hotel-wari-historial-ventas' && e.newValue) {
+        try {
+          const nuevoHistorial = JSON.parse(e.newValue)
+          if (nuevoHistorial && Array.isArray(nuevoHistorial)) {
+            setHistorialVentas(nuevoHistorial)
+          }
+        } catch (error) {
+          console.error("Error al sincronizar historial ventas:", error)
+        }
+      }
+
+      // Sincronizar clientes
+      if (e.key === 'hotel-wari-clientes' && e.newValue) {
+        try {
+          const nuevosClientes = JSON.parse(e.newValue)
+          if (nuevosClientes && Array.isArray(nuevosClientes)) {
+            setClientes(nuevosClientes)
+          }
+        } catch (error) {
+          console.error("Error al sincronizar clientes:", error)
+        }
+      }
+
+      // Sincronizar mensajes
+      if (e.key === 'hotel-wari-mensajes' && e.newValue) {
+        try {
+          const nuevosMensajes = JSON.parse(e.newValue)
+          if (nuevosMensajes && Array.isArray(nuevosMensajes)) {
+            setMensajes(nuevosMensajes)
+          }
+        } catch (error) {
+          console.error("Error al sincronizar mensajes:", error)
+        }
+      }
+    }
+
+    // Agregar listener para cambios en localStorage
+    window.addEventListener('storage', handleStorageChange)
+
+    // Limpiar listener al desmontar
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, []) // Solo se ejecuta una vez al montar el componente
+
   // --- Lógica de Sincronización en Tiempo Real y Notificaciones ---
 
   // Referencia para rastrear la cantidad previa de pedidos pendientes
