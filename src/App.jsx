@@ -725,7 +725,7 @@ function App() {
       }
     }
 
-    // Descontar stock
+    // Descontar stock de amenities
     const nuevosAmenities = amenities.map(producto => {
       const entrega = itemsAEntregar.find(i => i.id === producto.id)
       if (entrega) {
@@ -734,6 +734,23 @@ function App() {
       return producto
     })
     setAmenities(nuevosAmenities)
+
+    // **NUEVO: Descontar del inventario general**
+    // Mapeo de amenities a inventario:
+    // Jabones (amenity id:1) → Inventario id:2
+    // Shampoo (amenity id:2) → Inventario id:5
+    const mapeoAmenitiesInventario = {
+      1: 2, // Jabones
+      2: 5  // Shampoo
+    }
+
+    itemsAEntregar.forEach(item => {
+      const idInventario = mapeoAmenitiesInventario[item.id]
+      if (idInventario) {
+        // Descontar del inventario (cantidad negativa)
+        ajustarStock(idInventario, -item.cantidad)
+      }
+    })
 
     // Registrar en historial
     const nuevoRegistro = {
@@ -752,7 +769,7 @@ function App() {
     // Limpiar formulario
     setHabitacionEntrega('')
     setCantidadesEntrega({})
-    alert('Entrega registrada correctamente')
+    alert('Entrega registrada correctamente. El inventario se ha actualizado automáticamente.')
   }
 
   const cerrarSesion = () => {
@@ -1504,47 +1521,64 @@ function App() {
                 </div>
               </div>
 
-              <div className="tarjeta-entrega-amenities">
-                <h2>Registrar Entrega a Habitación</h2>
-                <div className="formulario-entrega">
-                  <div className="campo-formulario">
-                    <label>Habitación:</label>
-                    <select
-                      value={habitacionEntrega}
-                      onChange={(e) => setHabitacionEntrega(e.target.value)}
-                      className="select-habitacion-amenity"
-                    >
-                      <option value="">Seleccionar...</option>
-                      {habitaciones.map(h => (
-                        <option key={h.numero} value={h.numero}>
-                          Habitación {h.numero} ({h.estado})
-                        </option>
+              {/* Formulario de entrega - SOLO para recepcionistas */}
+              {usuarioActual?.rol === 'recepcionista' && (
+                <div className="tarjeta-entrega-amenities">
+                  <h2>Registrar Entrega a Habitación</h2>
+                  <div className="formulario-entrega">
+                    <div className="campo-formulario">
+                      <label>Habitación:</label>
+                      <select
+                        value={habitacionEntrega}
+                        onChange={(e) => setHabitacionEntrega(e.target.value)}
+                        className="select-habitacion-amenity"
+                      >
+                        <option value="">Seleccionar...</option>
+                        {habitaciones.map(h => (
+                          <option key={h.numero} value={h.numero}>
+                            Habitación {h.numero} ({h.estado})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="lista-seleccion-amenities">
+                      <p>Selecciona cantidades:</p>
+                      {amenities.map(item => (
+                        <div key={item.id} className="fila-seleccion-amenity">
+                          <label>{item.nombre}:</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max={item.cantidad}
+                            value={cantidadesEntrega[item.id] || ''}
+                            onChange={(e) => manejarCambioCantidad(item.id, e.target.value)}
+                            placeholder="0"
+                          />
+                        </div>
                       ))}
-                    </select>
-                  </div>
+                    </div>
 
-                  <div className="lista-seleccion-amenities">
-                    <p>Selecciona cantidades:</p>
-                    {amenities.map(item => (
-                      <div key={item.id} className="fila-seleccion-amenity">
-                        <label>{item.nombre}:</label>
-                        <input
-                          type="number"
-                          min="0"
-                          max={item.cantidad}
-                          value={cantidadesEntrega[item.id] || ''}
-                          onChange={(e) => manejarCambioCantidad(item.id, e.target.value)}
-                          placeholder="0"
-                        />
-                      </div>
-                    ))}
+                    <button className="boton-registrar-entrega" onClick={registrarEntregaAmenities}>
+                      Registrar Entrega
+                    </button>
                   </div>
-
-                  <button className="boton-registrar-entrega" onClick={registrarEntregaAmenities}>
-                    Registrar Entrega
-                  </button>
                 </div>
-              </div>
+              )}
+
+              {/* Mensaje para administradores */}
+              {usuarioActual?.rol === 'administrador' && (
+                <div className="tarjeta-entrega-amenities">
+                  <h2>Vista de Solo Lectura</h2>
+                  <div className="formulario-entrega">
+                    <p style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                      Como administrador, solo puedes visualizar el stock y el historial de entregas.
+                      <br />
+                      Para registrar entregas, inicia sesión como recepcionista.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="panel-historial-amenities">
