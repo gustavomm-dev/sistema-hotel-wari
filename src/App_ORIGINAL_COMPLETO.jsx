@@ -5,8 +5,7 @@ import simpleImg from './assets/simple.jpg'
 import dobleImg from './assets/doble.jpg'
 import familiarImg from './assets/familiar.jpg'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBed, faUserPlus, faReceipt, faBoxes, faHome, faSignOutAlt, faComments, faTrash, faCoffee, faPumpSoap, faHistory, faFileAlt, faClipboardList, faShoppingCart, faTshirt, faCog } from '@fortawesome/free-solid-svg-icons'
-import * as XLSX from 'xlsx'
+import { faBed, faUserPlus, faReceipt, faBoxes, faHome, faSignOutAlt, faComments, faTrash, faCoffee, faPumpSoap, faHistory, faFileAlt, faClipboardList, faShoppingCart, faTshirt } from '@fortawesome/free-solid-svg-icons'
 import {
   BarChart,
   Bar,
@@ -28,7 +27,11 @@ import {
 
 
 // Constantes en Español
-// NOTA: PRECIOS_HABITACION ahora es un estado dinámico (ver línea ~112)
+const PRECIOS_HABITACION = {
+  'Simple': 100,
+  'Doble': 120,
+  'Familiar': 180
+}
 
 const IMAGENES_HABITACION = {
   'Simple': simpleImg,
@@ -95,13 +98,12 @@ function App() {
   const [habitacionParaSalida, setHabitacionParaSalida] = useState(null)
   const [metodoPagoSeleccionado, setMetodoPagoSeleccionado] = useState('Paga al finalizar estadía')
 
-
   // Estado del Modal de Imagen (Zoom)
   const [imagenAmpliada, setImagenAmpliada] = useState(null)
 
   // Estados para Vista de Servicios Adicionales (NUEVO - Módulo 2)
   const [habitacionServicio, setHabitacionServicio] = useState('')
-  const [tabServicioActivo, setTabServicioActivo] = useState('lavanderia')
+  const [tabServicioActivo, setTabServicioActivo] = useState('lavanderia') // 'lavanderia' o 'tienda'
   const [cantidadesLavanderia, setCantidadesLavanderia] = useState({})
   const [cantidadesTienda, setCantidadesTienda] = useState({})
 
@@ -165,16 +167,11 @@ function App() {
     }
     return [
       { id: 1, producto: 'Toallas', categoria: 'Ropa de Cama', cantidad: 25 },
-      { id: 2, producto: 'Jabones', categoria: 'Higiene', cantidad: 50 },
+      { id: 2, producto: 'Jabones', categoria: 'Higiene', cantidad: 3 },
       { id: 3, producto: 'Bebidas (Botellas)', categoria: 'Minibar', cantidad: 15 },
       { id: 4, producto: 'Sábanas', categoria: 'Ropa de Cama', cantidad: 8 },
-      { id: 5, producto: 'Shampoo', categoria: 'Higiene', cantidad: 50 },
-      { id: 6, producto: 'Papel Higiénico', categoria: 'Higiene', cantidad: 30 },
-      { id: 7, producto: 'Acondicionador', categoria: 'Higiene', cantidad: 50 },
-      { id: 8, producto: 'Crema corporal', categoria: 'Higiene', cantidad: 50 },
-      { id: 9, producto: 'Enjuague bucal', categoria: 'Higiene', cantidad: 50 },
-      { id: 10, producto: 'Kit afeitar', categoria: 'Higiene', cantidad: 50 },
-      { id: 11, producto: 'Kit cepillo dental', categoria: 'Higiene', cantidad: 50 }
+      { id: 5, producto: 'Shampoo', categoria: 'Higiene', cantidad: 2 },
+      { id: 6, producto: 'Papel Higiénico', categoria: 'Higiene', cantidad: 30 }
     ]
   })
 
@@ -228,11 +225,10 @@ function App() {
     return [
       { id: 1, nombre: 'Jabones', cantidad: 50 },
       { id: 2, nombre: 'Shampoo', cantidad: 50 },
-      { id: 3, nombre: 'Acondicionador', cantidad: 50 },
-      { id: 4, nombre: 'Crema corporal', cantidad: 50 },
-      { id: 5, nombre: 'Enjuague bucal', cantidad: 50 },
-      { id: 6, nombre: 'Kit afeitar', cantidad: 50 },
-      { id: 7, nombre: 'Kit cepillo dental', cantidad: 50 }
+      { id: 3, nombre: 'Colinos', cantidad: 50 },
+      { id: 4, nombre: 'Enjuague bucal', cantidad: 50 },
+      { id: 5, nombre: 'Crema Corporal', cantidad: 50 },
+      { id: 6, nombre: 'Otros', cantidad: 50 }
     ]
   })
 
@@ -258,49 +254,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem('hotel-wari-historial-amenities', JSON.stringify(historialAmenities))
   }, [historialAmenities])
-
-  // MIGRACIÓN AUTOMÁTICA: Actualizar amenities e inventario con nuevos productos
-  useEffect(() => {
-    const versionActual = '2.0' // Versión con 7 amenities y 11 items de inventario
-    const versionGuardada = localStorage.getItem('hotel-wari-version-datos')
-
-    if (versionGuardada !== versionActual) {
-      console.log('🔄 Actualizando productos a versión', versionActual)
-
-      // Actualizar amenities a 7 productos
-      const nuevosAmenities = [
-        { id: 1, nombre: 'Jabones', cantidad: 50 },
-        { id: 2, nombre: 'Shampoo', cantidad: 50 },
-        { id: 3, nombre: 'Acondicionador', cantidad: 50 },
-        { id: 4, nombre: 'Crema corporal', cantidad: 50 },
-        { id: 5, nombre: 'Enjuague bucal', cantidad: 50 },
-        { id: 6, nombre: 'Kit afeitar', cantidad: 50 },
-        { id: 7, nombre: 'Kit cepillo dental', cantidad: 50 }
-      ]
-      setAmenities(nuevosAmenities)
-
-      // Actualizar inventario a 11 productos
-      const nuevoInventario = [
-        { id: 1, producto: 'Toallas', categoria: 'Ropa de Cama', cantidad: 25 },
-        { id: 2, producto: 'Jabones', categoria: 'Higiene', cantidad: 50 },
-        { id: 3, producto: 'Bebidas (Botellas)', categoria: 'Minibar', cantidad: 15 },
-        { id: 4, producto: 'Sábanas', categoria: 'Ropa de Cama', cantidad: 8 },
-        { id: 5, producto: 'Shampoo', categoria: 'Higiene', cantidad: 50 },
-        { id: 6, producto: 'Papel Higiénico', categoria: 'Higiene', cantidad: 30 },
-        { id: 7, producto: 'Acondicionador', categoria: 'Higiene', cantidad: 50 },
-        { id: 8, producto: 'Crema corporal', categoria: 'Higiene', cantidad: 50 },
-        { id: 9, producto: 'Enjuague bucal', categoria: 'Higiene', cantidad: 50 },
-        { id: 10, producto: 'Kit afeitar', categoria: 'Higiene', cantidad: 50 },
-        { id: 11, producto: 'Kit cepillo dental', categoria: 'Higiene', cantidad: 50 }
-      ]
-      setInventario(nuevoInventario)
-
-      // Marcar como actualizado
-      localStorage.setItem('hotel-wari-version-datos', versionActual)
-      console.log('✅ Productos actualizados correctamente')
-    }
-  }, [])
-
 
   // Estado de Historial de Check-Ins/Check-Outs (NUEVO)
   const [historialCheckIns, setHistorialCheckIns] = useState(() => {
@@ -350,49 +303,24 @@ function App() {
   const [filtroHabitacion, setFiltroHabitacion] = useState('')
   const [filtroEstado, setFiltroEstado] = useState('todos')
 
-  // Estados para filtros de gráfico de facturación
-  const [filtroGraficoFechaInicio, setFiltroGraficoFechaInicio] = useState('')
-  const [filtroGraficoFechaFin, setFiltroGraficoFechaFin] = useState('')
-
-  // Estado de Precios de Habitaciones (Dinámico)
-  const [preciosHabitacion, setPreciosHabitacion] = useState(() => {
-    const preciosGuardados = localStorage.getItem('hotel-wari-precios-habitacion')
-    if (preciosGuardados) {
-      try {
-        return JSON.parse(preciosGuardados)
-      } catch (e) {
-        console.error("Error parsing precios:", e)
-      }
-    }
-    return {
-      'Simple': 100,
-      'Doble': 120,
-      'Familiar': 180
-    }
-  })
-
   useEffect(() => {
     localStorage.setItem('hotel-wari-historial-checkins', JSON.stringify(historialCheckIns))
   }, [historialCheckIns])
 
-  // Persistencia de Precios de Habitaciones
-  useEffect(() => {
-    localStorage.setItem('hotel-wari-precios-habitacion', JSON.stringify(preciosHabitacion))
-  }, [preciosHabitacion])
-
-  // ========== MÓDULO 1: ESTADOS DE AUDITORÍA ==========
+  // Estado de Historial de Auditoría (NUEVO - Módulo 1)
   const [historialAuditoria, setHistorialAuditoria] = useState(() => {
-    const guardado = localStorage.getItem('hotel-wari-historial-auditoria')
-    if (guardado) {
+    const historialGuardado = localStorage.getItem('hotel-wari-historial-auditoria')
+    if (historialGuardado) {
       try {
-        return JSON.parse(guardado)
+        return JSON.parse(historialGuardado)
       } catch (e) {
-        console.error("Error al parsear auditoría:", e)
+        console.error("Error parsing historial auditoría:", e)
       }
     }
     return []
   })
 
+  // Estados para filtros de auditoría
   const [filtroAuditoriaFechaInicio, setFiltroAuditoriaFechaInicio] = useState('')
   const [filtroAuditoriaFechaFin, setFiltroAuditoriaFechaFin] = useState('')
   const [filtroAuditoriaTipo, setFiltroAuditoriaTipo] = useState('todos')
@@ -403,14 +331,14 @@ function App() {
     localStorage.setItem('hotel-wari-historial-auditoria', JSON.stringify(historialAuditoria))
   }, [historialAuditoria])
 
-  // ========== MÓDULO 2: CATÁLOGOS DE SERVICIOS ==========
+  // Estado de Catálogos de Servicios (NUEVO - Módulo 2)
   const [catalogoLavanderia, setCatalogoLavanderia] = useState(() => {
-    const guardado = localStorage.getItem('hotel-wari-catalogo-lavanderia')
-    if (guardado) {
+    const catalogoGuardado = localStorage.getItem('hotel-wari-catalogo-lavanderia')
+    if (catalogoGuardado) {
       try {
-        return JSON.parse(guardado)
+        return JSON.parse(catalogoGuardado)
       } catch (e) {
-        console.error("Error al parsear lavandería:", e)
+        console.error("Error parsing catálogo lavandería:", e)
       }
     }
     return [
@@ -424,12 +352,12 @@ function App() {
   })
 
   const [catalogoTienda, setCatalogoTienda] = useState(() => {
-    const guardado = localStorage.getItem('hotel-wari-catalogo-tienda')
-    if (guardado) {
+    const catalogoGuardado = localStorage.getItem('hotel-wari-catalogo-tienda')
+    if (catalogoGuardado) {
       try {
-        return JSON.parse(guardado)
+        return JSON.parse(catalogoGuardado)
       } catch (e) {
-        console.error("Error al parsear tienda:", e)
+        console.error("Error parsing catálogo tienda:", e)
       }
     }
     return [
@@ -442,13 +370,14 @@ function App() {
     ]
   })
 
+  // Estado de Consumos por Habitación (NUEVO - Módulo 2)
   const [consumosHabitaciones, setConsumosHabitaciones] = useState(() => {
-    const guardado = localStorage.getItem('hotel-wari-consumos-habitaciones')
-    if (guardado) {
+    const consumosGuardados = localStorage.getItem('hotel-wari-consumos-habitaciones')
+    if (consumosGuardados) {
       try {
-        return JSON.parse(guardado)
+        return JSON.parse(consumosGuardados)
       } catch (e) {
-        console.error("Error al parsear consumos:", e)
+        console.error("Error parsing consumos habitaciones:", e)
       }
     }
     return {}
@@ -465,6 +394,112 @@ function App() {
   useEffect(() => {
     localStorage.setItem('hotel-wari-consumos-habitaciones', JSON.stringify(consumosHabitaciones))
   }, [consumosHabitaciones])
+
+  // --- FIREBASE: Migración Automática y Sincronización en Tiempo Real ---
+
+  // Migración única de localStorage a Firestore
+  useEffect(() => {
+    const migrado = localStorage.getItem('firebase-migrated')
+    if (!migrado) {
+      console.log('🔄 Iniciando migración a Firebase...')
+      migrateLocalStorageToFirestore().then(() => {
+        localStorage.setItem('firebase-migrated', 'true')
+        console.log('✅ Migración a Firebase completada')
+      }).catch(error => {
+        console.error('❌ Error en migración:', error)
+      })
+    }
+  }, [])
+
+  // Sincronización en tiempo real: Habitaciones
+  useEffect(() => {
+    const unsubscribe = subscribeToCollection('habitaciones', (data) => {
+      if (data.length > 0) {
+        setHabitaciones(data)
+      }
+    })
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (habitaciones.length > 0) {
+      saveToFirestore('habitaciones', habitaciones)
+    }
+  }, [habitaciones])
+
+  // Sincronización en tiempo real: Inventario
+  useEffect(() => {
+    const unsubscribe = subscribeToCollection('inventario', (data) => {
+      if (data.length > 0) {
+        setInventario(data)
+      }
+    })
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (inventario.length > 0) {
+      saveToFirestore('inventario', inventario)
+    }
+  }, [inventario])
+
+  // Sincronización en tiempo real: Amenities
+  useEffect(() => {
+    const unsubscribe = subscribeToCollection('amenities', (data) => {
+      if (data.length > 0) {
+        setAmenities(data)
+      }
+    })
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (amenities.length > 0) {
+      saveToFirestore('amenities', amenities)
+    }
+  }, [amenities])
+
+  // Sincronización en tiempo real: Historial Amenities
+  useEffect(() => {
+    const unsubscribe = subscribeToCollection('historial-amenities', (data) => {
+      if (data.length > 0) {
+        setHistorialAmenities(data)
+      }
+    })
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (historialAmenities.length > 0) {
+      saveToFirestore('historial-amenities', historialAmenities)
+    }
+  }, [historialAmenities])
+
+  // Sincronización en tiempo real: Historial Ventas
+  useEffect(() => {
+    const unsubscribe = subscribeToCollection('historial-ventas', (data) => {
+      if (data.length > 0) {
+        setHistorialVentas(data)
+      }
+    })
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (historialVentas.length > 0) {
+      saveToFirestore('historial-ventas', historialVentas)
+    }
+  }, [historialVentas])
+
+  // Sincronización en tiempo real: Clientes
+  useEffect(() => {
+    const unsubscribe = subscribeToCollection('clientes', (data) => {
+      if (data.length > 0) {
+        setClientes(data)
+      }
+    })
+    return () => unsubscribe()
+  }, [])
 
   useEffect(() => {
     if (clientes.length > 0) {
@@ -711,7 +746,24 @@ function App() {
     setAudioHabilitado(true)
   }
 
+  // Efecto para escuchar cambios en otras pestañas (Sincronización)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'hotel-wari-habitaciones' && e.newValue) {
+        try {
+          const nuevasHabitaciones = JSON.parse(e.newValue)
+          if (nuevasHabitaciones && Array.isArray(nuevasHabitaciones)) {
+            setHabitaciones(nuevasHabitaciones)
+          }
+        } catch (error) {
+          console.error("Error al sincronizar habitaciones:", error)
+        }
+      }
+    }
 
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   // Efecto para detectar nuevos pedidos y notificar al Admin
   useEffect(() => {
@@ -745,28 +797,6 @@ function App() {
   }, [])
 
   // ---------------------------------------------------------------
-
-
-  // ========== MÓDULO 1: FUNCIÓN DE AUDITORÍA ==========
-  const registrarAuditoria = (accion, detalles, extras = {}) => {
-    const ahora = new Date()
-    const fecha = ahora.toLocaleDateString('es-PE')
-    const hora = `${ahora.getHours()}:${ahora.getMinutes().toString().padStart(2, '0')}`
-
-    const registroAuditoria = {
-      id: Date.now(),
-      fecha: fecha,
-      hora: hora,
-      usuario: usuarioActual?.usuario || 'Sistema',
-      rol: usuarioActual?.rol || 'N/A',
-      accion: accion,
-      detalles: detalles,
-      habitacion: extras.habitacion || null,
-      monto: extras.monto || null
-    }
-
-    setHistorialAuditoria(prevHistorial => [registroAuditoria, ...prevHistorial])
-  }
 
 
   // Funciones de Lógica
@@ -825,6 +855,26 @@ function App() {
     }
   }
 
+  // Función de Auditoría (NUEVO - Módulo 1)
+  const registrarAuditoria = (accion, detalles, extras = {}) => {
+    const ahora = new Date()
+    const fecha = ahora.toLocaleDateString('es-PE')
+    const hora = `${ahora.getHours()}:${ahora.getMinutes().toString().padStart(2, '0')}`
+
+    const registroAuditoria = {
+      id: Date.now(),
+      fecha: fecha,
+      hora: hora,
+      usuario: usuarioActual?.usuario || 'Sistema',
+      rol: usuarioActual?.rol || 'N/A',
+      accion: accion, // 'check-in', 'check-out', 'limpieza', 'amenities', 'lavanderia', 'tienda', 'venta'
+      detalles: detalles,
+      habitacion: extras.habitacion || null,
+      monto: extras.monto || null
+    }
+
+    setHistorialAuditoria(prevHistorial => [registroAuditoria, ...prevHistorial])
+  }
 
   const manejarRegistro = () => {
     if (!nombreHuesped || !dniHuesped || !habitacionSeleccionada || !duracionEstadia) {
@@ -851,7 +901,7 @@ function App() {
     const ahora = new Date()
     const cadenaHora = `${ahora.getHours()}:${ahora.getMinutes().toString().padStart(2, '0')}`
     const fechaActual = ahora.toLocaleDateString('es-PE')
-    const costoCalculado = preciosHabitacion[habitacion.tipo] * parseInt(duracionEstadia)
+    const costoCalculado = PRECIOS_HABITACION[habitacion.tipo] * parseInt(duracionEstadia)
 
     // NUEVO: Crear registro en historial de check-ins
     const nuevoCheckIn = {
@@ -1302,109 +1352,6 @@ function App() {
     URL.revokeObjectURL(url)
   }
 
-  // Función para exportar historial de ventas a Excel
-  const exportarAExcel = () => {
-    if (historialVentas.length === 0) {
-      alert('No hay datos para exportar')
-      return
-    }
-
-    // Preparar datos para Excel
-    const datosExcel = historialVentas.map(venta => ({
-      'Fecha Salida': venta.fechaSalida,
-      'Hora Salida': venta.horaSalida,
-      'Habitación': venta.numeroHabitacion,
-      'Tipo': venta.tipoHabitacion,
-      'Huésped': venta.nombreHuesped,
-      'DNI': venta.dniHuesped,
-      'Estadía': venta.duracionEstadia,
-      'Método de Pago': venta.metodoPago || 'N/A',
-      'Total (S/)': venta.costoTotal
-    }))
-
-    // Crear libro de trabajo
-    const ws = XLSX.utils.json_to_sheet(datosExcel)
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, 'Ventas')
-
-    // Generar nombre de archivo con fecha actual
-    const fecha = new Date().toLocaleDateString('es-PE').replace(/\//g, '-')
-    const nombreArchivo = `Ventas_Hotel_Wari_${fecha}.xlsx`
-
-    // Descargar archivo
-    XLSX.writeFile(wb, nombreArchivo)
-
-    // Registrar en auditoría
-    registrarAuditoria('Exportación Excel', `Exportó ${historialVentas.length} registros de ventas`)
-  }
-
-  // Función para filtrar datos del gráfico según rango de fechas
-  const filtrarDatosGrafico = () => {
-    let ventasFiltradas = [...historialVentas]
-
-    // Aplicar filtros de fecha si existen
-    if (filtroGraficoFechaInicio || filtroGraficoFechaFin) {
-      ventasFiltradas = ventasFiltradas.filter(venta => {
-        const fechaVenta = venta.fechaSalida
-
-        if (filtroGraficoFechaInicio && filtroGraficoFechaFin) {
-          return fechaVenta >= filtroGraficoFechaInicio && fechaVenta <= filtroGraficoFechaFin
-        } else if (filtroGraficoFechaInicio) {
-          return fechaVenta >= filtroGraficoFechaInicio
-        } else if (filtroGraficoFechaFin) {
-          return fechaVenta <= filtroGraficoFechaFin
-        }
-        return true
-      })
-    }
-
-    // Agrupar por fecha y sumar ingresos
-    const ingresosPorFecha = {}
-    ventasFiltradas.forEach(venta => {
-      const fecha = venta.fechaSalida
-      if (!ingresosPorFecha[fecha]) {
-        ingresosPorFecha[fecha] = 0
-      }
-      ingresosPorFecha[fecha] += venta.costoTotal || 0
-    })
-
-    // Convertir a array para el gráfico
-    return Object.entries(ingresosPorFecha)
-      .map(([fecha, total]) => ({
-        fecha: fecha,
-        ingresos: total
-      }))
-      .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
-  }
-
-  // Función para limpiar filtros de gráfico
-  const limpiarFiltrosGrafico = () => {
-    setFiltroGraficoFechaInicio('')
-    setFiltroGraficoFechaFin('')
-  }
-
-  // Función para actualizar precios de habitaciones
-  const actualizarPrecioHabitacion = (tipo, nuevoPrecio) => {
-    const precio = parseFloat(nuevoPrecio)
-    if (isNaN(precio) || precio <= 0) {
-      alert('Por favor ingrese un precio válido (mayor a 0)')
-      return false
-    }
-
-    setPreciosHabitacion(prev => ({
-      ...prev,
-      [tipo]: precio
-    }))
-
-    // Registrar en auditoría
-    registrarAuditoria('Actualización de Precios', `Cambió precio de habitación ${tipo} a S/ ${precio}`)
-
-    // Guardar en Firebase
-    saveToFirestore('precios-habitacion', [{ Simple: preciosHabitacion.Simple, Doble: preciosHabitacion.Doble, Familiar: preciosHabitacion.Familiar, [tipo]: precio }])
-
-    return true
-  }
-
   // Funciones de Mensajería
   const enviarMensaje = () => {
     if (!nuevoMensaje.trim()) {
@@ -1583,13 +1530,8 @@ function App() {
     // Jabones (amenity id:1) → Inventario id:2
     // Shampoo (amenity id:2) → Inventario id:5
     const mapeoAmenitiesInventario = {
-      1: 2,   // Jabones
-      2: 5,   // Shampoo
-      3: 7,   // Acondicionador
-      4: 8,   // Crema corporal
-      5: 9,   // Enjuague bucal
-      6: 10,  // Kit afeitar
-      7: 11   // Kit cepillo dental
+      1: 2, // Jabones
+      2: 5  // Shampoo
     }
 
     itemsAEntregar.forEach(item => {
@@ -1692,13 +1634,6 @@ function App() {
                 <span>Facturación</span>
               </button>
               <button
-                className={`navbar-enlace ${vistaActual === 'configuracion' ? 'activo' : ''}`}
-                onClick={() => setVistaActual('configuracion')}
-              >
-                <FontAwesomeIcon icon={faCog} />
-                <span>Configuración</span>
-              </button>
-              <button
                 className={`navbar-enlace ${vistaActual === 'desayunos' ? 'activo' : ''}`}
                 onClick={() => setVistaActual('desayunos')}
               >
@@ -1748,15 +1683,6 @@ function App() {
             <FontAwesomeIcon icon={faClipboardList} />
             <span>Historial de Movimientos</span>
           </button>
-          {usuarioActual?.rol === 'administrador' && (
-            <button
-              className={`navbar-enlace ${vistaActual === 'configuracion' ? 'activo' : ''}`}
-              onClick={() => setVistaActual('configuracion')}
-            >
-              <FontAwesomeIcon icon={faCog} />
-              <span>Configuración</span>
-            </button>
-          )}
         </div>
         <button className="boton-cerrar-sesion" onClick={cerrarSesion}>
           <FontAwesomeIcon icon={faSignOutAlt} />
@@ -2038,39 +1964,6 @@ function App() {
         <div className="contenedor-facturacion">
           <h1 className="titulo-facturacion">Historial de Facturación</h1>
 
-          {/* Controles de Exportación y Filtros */}
-          {historialVentas.length > 0 && (
-            <div className="controles-facturacion">
-              <button className="boton-exportar-excel" onClick={exportarAExcel}>
-                📊 Descargar Excel
-              </button>
-
-              <div className="filtros-fecha">
-                <label>
-                  Desde:
-                  <input
-                    type="date"
-                    value={filtroGraficoFechaInicio}
-                    onChange={(e) => setFiltroGraficoFechaInicio(e.target.value)}
-                  />
-                </label>
-                <label>
-                  Hasta:
-                  <input
-                    type="date"
-                    value={filtroGraficoFechaFin}
-                    onChange={(e) => setFiltroGraficoFechaFin(e.target.value)}
-                  />
-                </label>
-                {(filtroGraficoFechaInicio || filtroGraficoFechaFin) && (
-                  <button className="boton-limpiar-filtros" onClick={limpiarFiltrosGrafico}>
-                    Limpiar Filtros
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
           {historialVentas.length === 0 ? (
             <div className="mensaje-sin-datos">
               <p>No hay registros de ventas aún.</p>
@@ -2117,58 +2010,6 @@ function App() {
               </div>
             </>
           )}
-        </div>
-      )
-    }
-
-    // Vista de Configuración de Precios
-    else if (vistaActual === 'configuracion') {
-      contenidoVista = (
-        <div className="contenedor-configuracion">
-          <h1 className="titulo-configuracion">Configuración de Precios</h1>
-          <p className="subtitulo-configuracion">Ajusta los precios de las habitaciones según temporada o necesidad</p>
-
-          <div className="cuadricula-precios">
-            {['Simple', 'Doble', 'Familiar'].map(tipo => (
-              <div key={tipo} className="tarjeta-precio">
-                <div className="encabezado-precio">
-                  <h3>Habitación {tipo}</h3>
-                  <img
-                    src={IMAGENES_HABITACION[tipo]}
-                    alt={`Habitación ${tipo}`}
-                    className="miniatura-precio"
-                  />
-                </div>
-                <div className="cuerpo-precio">
-                  <div className="precio-actual">
-                    <span className="etiqueta">Precio Actual:</span>
-                    <span className="valor">S/ {preciosHabitacion[tipo]}</span>
-                  </div>
-                  <div className="grupo-edicion">
-                    <label htmlFor={`precio-${tipo}`}>Nuevo Precio (S/):</label>
-                    <input
-                      id={`precio-${tipo}`}
-                      type="number"
-                      min="1"
-                      step="0.01"
-                      defaultValue={preciosHabitacion[tipo]}
-                      onBlur={(e) => {
-                        const exito = actualizarPrecioHabitacion(tipo, e.target.value)
-                        if (exito) {
-                          alert(`✅ Precio de habitación ${tipo} actualizado correctamente`)
-                        }
-                      }}
-                      placeholder="Ingrese nuevo precio"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="nota-configuracion">
-            <p>💡 <strong>Nota:</strong> Los cambios se guardan automáticamente y se sincronizan en tiempo real con Firebase.</p>
-          </div>
         </div>
       )
     }
@@ -3140,3 +2981,6 @@ function App() {
   )
 }
 export default App
+
+
+

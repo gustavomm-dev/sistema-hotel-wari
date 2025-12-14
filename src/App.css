@@ -1785,3 +1785,749 @@
   font-style: italic;
   margin-top: 1rem;
 }
+/* Estilos para Vista de Auditoría (Módulo 1) */
+.contenedor-auditoria {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.titulo-auditoria {
+    color: #2c3e50;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-weight: 300;
+}
+
+.subtitulo-auditoria {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.panel-filtros-auditoria {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.grupo-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.grupo-filtro label {
+    font-weight: 600;
+    color: #34495e;
+    font-size: 0.9rem;
+}
+
+.grupo-filtro input,
+.grupo-filtro select {
+    padding: 0.7rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+}
+
+.grupo-filtro input:focus,
+.grupo-filtro select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.boton-limpiar-filtros {
+    padding: 0.7rem 1.5rem;
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: fit-content;
+}
+
+.boton-limpiar-filtros:hover {
+    background-color: #7f8c8d;
+}
+
+.tabla-auditoria-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.contador-registros {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.tabla-auditoria {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.tabla-auditoria thead {
+    background-color: #34495e;
+    color: white;
+}
+
+.tabla-auditoria th {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tabla-auditoria tbody tr {
+    border-bottom: 1px solid #ecf0f1;
+    transition: background-color 0.2s;
+}
+
+.tabla-auditoria tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.tabla-auditoria td {
+    padding: 0.9rem 0.75rem;
+    color: #2c3e50;
+}
+
+.celda-detalles {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.badge-rol {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.badge-rol.administrador {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.badge-rol.recepcionista {
+    background-color: #3498db;
+    color: white;
+}
+
+.badge-accion {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    text-transform: capitalize;
+}
+
+.mensaje-sin-registros {
+    text-align: center;
+    padding: 3rem;
+    color: #95a5a6;
+    font-size: 1.1rem;
+}
+
+.mensaje-sin-registros p {
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .tabla-auditoria {
+        font-size: 0.85rem;
+    }
+
+    .tabla-auditoria th,
+    .tabla-auditoria td {
+        padding: 0.7rem 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .panel-filtros-auditoria {
+        grid-template-columns: 1fr;
+    }
+
+    .tabla-auditoria-container {
+        overflow-x: scroll;
+    }
+
+    .tabla-auditoria {
+        min-width: 900px;
+    }
+}
+/* Estilos para Vista de Servicios Adicionales (Módulo 2) */
+.contenedor-servicios {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.titulo-servicios {
+    color: #2c3e50;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-weight: 300;
+}
+
+.subtitulo-servicios {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.panel-selector-habitacion {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.panel-selector-habitacion label {
+    display: block;
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 0.7rem;
+    font-size: 1.05rem;
+}
+
+.panel-selector-habitacion select {
+    width: 100%;
+    padding: 0.9rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.panel-selector-habitacion select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.tabs-servicios {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab-servicio {
+    flex: 1;
+    padding: 1rem;
+    background: white;
+    border: 2px solid #ecf0f1;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.tab-servicio:hover {
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.tab-servicio.activo {
+    background: #3498db;
+    border-color: #3498db;
+    color: white;
+}
+
+.contenido-tab-servicios {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.panel-lavanderia h3,
+.panel-tienda h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.grid-items-servicio {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.tarjeta-item-servicio {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 2px solid #ecf0f1;
+    transition: all 0.3s;
+}
+
+.tarjeta-item-servicio:hover {
+    border-color: #3498db;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+.info-item-servicio h4 {
+    color: #2c3e50;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.precio-item {
+    color: #27ae60;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+.stock-item {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin: 0.3rem 0;
+}
+
+.stock-item.stock-bajo {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.controles-cantidad {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.controles-cantidad button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #3498db;
+    color: white;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.controles-cantidad button:hover {
+    background: #2980b9;
+}
+
+.controles-cantidad input {
+    width: 70px;
+    text-align: center;
+    padding: 0.6rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.boton-agregar-servicio {
+    width: 100%;
+    padding: 1rem;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.boton-agregar-servicio:hover {
+    background: #229954;
+}
+
+.panel-resumen-consumos {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.panel-resumen-consumos h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.seccion-resumen {
+    margin-bottom: 2rem;
+}
+
+.seccion-resumen h4 {
+    color: #34495e;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tabla-resumen-consumos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.tabla-resumen-consumos th {
+    background: #34495e;
+    color: white;
+    padding: 0.8rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+.tabla-resumen-consumos td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #ecf0f1;
+    color: #2c3e50;
+}
+
+.tabla-resumen-consumos tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.mensaje-sin-consumos {
+    text-align: center;
+    padding: 2rem;
+    color: #95a5a6;
+    font-style: italic;
+}
+
+.total-consumos {
+    background: #ecf0f1;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: right;
+    font-size: 1.2rem;
+    color: #2c3e50;
+}
+
+.mensaje-seleccionar-habitacion {
+    background: white;
+    padding: 3rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.mensaje-seleccionar-habitacion p {
+    color: #7f8c8d;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .grid-items-servicio {
+        grid-template-columns: 1fr;
+    }
+
+    .tabs-servicios {
+        flex-direction: column;
+    }
+}
+/* ========== ESTILOS PARA NUEVAS FUNCIONALIDADES ========== */
+
+/* Controles de Facturación (Botón Excel + Filtros de Fecha) */
+.controles-facturacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    flex-wrap: wrap;
+}
+
+.boton-exportar-excel {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.boton-exportar-excel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(56, 239, 125, 0.6);
+    background: linear-gradient(135deg, #0f8a7e 0%, #2ed86d 100%);
+}
+
+.boton-exportar-excel:active {
+    transform: translateY(-1px);
+}
+
+.filtros-fecha {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filtros-fecha label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.filtros-fecha input[type="date"] {
+    padding: 0.7rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    color: #2c3e50;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.filtros-fecha input[type="date"]:focus {
+    outline: none;
+    border-color: #38ef7d;
+    box-shadow: 0 0 0 3px rgba(56, 239, 125, 0.2);
+    background: white;
+}
+
+.boton-limpiar-filtros {
+    padding: 0.7rem 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid white;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.boton-limpiar-filtros:hover {
+    background: white;
+    color: #667eea;
+    transform: translateY(-2px);
+}
+
+/* Vista de Configuración de Precios */
+.contenedor-configuracion {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.titulo-configuracion {
+    color: #2c3e50;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 300;
+}
+
+.subtitulo-configuracion {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.cuadricula-precios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.tarjeta-precio {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.tarjeta-precio:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.encabezado-precio {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.5rem;
+    text-align: center;
+    color: white;
+}
+
+.encabezado-precio h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.miniatura-precio {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.cuerpo-precio {
+    padding: 2rem;
+}
+
+.precio-actual {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.precio-actual .etiqueta {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.precio-actual .valor {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.grupo-edicion {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.grupo-edicion label {
+    color: #34495e;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.grupo-edicion input[type="number"] {
+    padding: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    transition: all 0.3s ease;
+}
+
+.grupo-edicion input[type="number"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.grupo-edicion input[type="number"]:valid {
+    border-color: #38ef7d;
+}
+
+.nota-configuracion {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(252, 182, 159, 0.3);
+}
+
+.nota-configuracion p {
+    margin: 0;
+    color: #8b4513;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.nota-configuracion strong {
+    color: #d2691e;
+}
+
+/* Responsive para controles de facturación */
+@media (max-width: 768px) {
+    .controles-facturacion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .boton-exportar-excel {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .filtros-fecha {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .filtros-fecha label {
+        width: 100%;
+    }
+
+    .filtros-fecha input[type="date"] {
+        width: 100%;
+    }
+
+    .cuadricula-precios {
+        grid-template-columns: 1fr;
+    }
+}

@@ -108,6 +108,7 @@ export const migrateLocalStorageToFirestore = async () => {
         'hotel-wari-amenities',
         'hotel-wari-historial-amenities',
         'hotel-wari-historial-ventas',
+        'hotel-wari-historial-checkins',
         'hotel-wari-clientes',
         'hotel-wari-mensajes'
     ];
